@@ -1,0 +1,101 @@
+<div class="dynamic-form-container">
+  <div class="form-header">
+    <h2>{{title}}</h2>
+  </div>
+
+  <div class="form-content">
+    <form [formGroup]="form" class="dynamic-form">
+      <div class="form-grid">
+        <div 
+          *ngFor="let field of formFields" 
+          class="form-field"
+          [ngClass]="{'full-width': field.type === 'boolean'}">
+          
+          <!-- Text Input -->
+          <mat-form-field *ngIf="field.type === 'text'">
+            <mat-label>{{field.label}}</mat-label>
+            <input 
+              matInput 
+              [formControlName]="field.field"
+              [placeholder]="field.placeholder"
+              [disabled]="field.disabled">
+            <mat-error *ngIf="isFieldInvalid(field.field)">
+              {{getFieldError(field.field)}}
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Email Input -->
+          <mat-form-field *ngIf="field.type === 'email'">
+            <mat-label>{{field.label}}</mat-label>
+            <input 
+              matInput 
+              type="email"
+              [formControlName]="field.field"
+              [placeholder]="field.placeholder"
+              [disabled]="field.disabled">
+            <mat-error *ngIf="isFieldInvalid(field.field)">
+              {{getFieldError(field.field)}}
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Number Input -->
+          <mat-form-field *ngIf="field.type === 'number'">
+            <mat-label>{{field.label}}</mat-label>
+            <input 
+              matInput 
+              type="number"
+              [formControlName]="field.field"
+              [placeholder]="field.placeholder"
+              [min]="field.min"
+              [max]="field.max"
+              [disabled]="field.disabled">
+            <mat-error *ngIf="isFieldInvalid(field.field)">
+              {{getFieldError(field.field)}}
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Date Input -->
+          <mat-form-field *ngIf="field.type === 'date'">
+            <mat-label>{{field.label}}</mat-label>
+            <input 
+              matInput 
+              [matDatepicker]="picker"
+              [formControlName]="field.field"
+              [disabled]="field.disabled">
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+            <mat-error *ngIf="isFieldInvalid(field.field)">
+              {{getFieldError(field.field)}}
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Boolean Input (Checkbox) -->
+          <div *ngIf="field.type === 'boolean'" class="checkbox-field">
+            <mat-checkbox 
+              [formControlName]="field.field"
+              [disabled]="field.disabled">
+              {{field.label}}
+            </mat-checkbox>
+            <mat-error *ngIf="isFieldInvalid(field.field)" class="checkbox-error">
+              {{getFieldError(field.field)}}
+            </mat-error>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="form-actions">
+    <button mat-button (click)="onCancel()" type="button">
+      Cancel
+    </button>
+    <button 
+      mat-flat-button 
+      color="primary" 
+      (click)="onSave()" 
+      [disabled]="form.invalid"
+      type="button">
+      {{isEditMode ? 'Update' : 'Save'}}
+    </button>
+  </div>
+</div>
