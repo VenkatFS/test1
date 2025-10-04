@@ -34,9 +34,32 @@ export class FormComponent implements OnInit {
   form: FormGroup;
   isEditMode: boolean = false;
 
+  const selectedRecord = {
+  id: "12345",
+  endpoint_id: "endpoint-001",
+  model_params: {
+    temperature: 0.7,
+    max_tokens: 1500,
+    top_k: 50,
+    top_p: 0.9,
+    repetition_penalty: 1.1,
+    do_sample: true,
+    stream: false
+  },
+  agent_name: "Customer Support Agent",
+  agent_node: "node-001",
+  created_by: "admin@company.com",
+  updated_by: "user@company.com",
+  created_at: "2024-01-15T10:30:00Z",
+  updated_at: "2024-01-20T14:45:00Z",
+  is_active: true
+};
+
   constructor(private fb: FormBuilder) {
     this.form = this.fb.group({});
   }
+
+  
 
   ngOnInit(): void {
     this.initializeForm();
