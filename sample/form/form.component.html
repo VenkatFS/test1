@@ -1,0 +1,238 @@
+<div class="form-container" *ngIf="isVisible">
+  <div class="form-header">
+    <h3>{{ isEditMode ? 'Edit Record' : 'Add New Record' }}</h3>
+  </div>
+
+  <form [formGroup]="form" class="form-content">
+    <div class="form-row">
+      <div class="form-field">
+        <label for="endpoint_id">Endpoint ID *</label>
+        <input 
+          pInputText 
+          id="endpoint_id" 
+          formControlName="endpoint_id"
+          placeholder="Enter endpoint ID"
+          [class.error]="form.get('endpoint_id')?.invalid && form.get('endpoint_id')?.touched"
+        />
+        <small class="error-text" *ngIf="getFieldError('endpoint_id')">
+          {{ getFieldError('endpoint_id') }}
+        </small>
+      </div>
+
+      <div class="form-field">
+        <label for="agent_name">Agent Name *</label>
+        <input 
+          pInputText 
+          id="agent_name" 
+          formControlName="agent_name"
+          placeholder="Enter agent name"
+          [class.error]="form.get('agent_name')?.invalid && form.get('agent_name')?.touched"
+        />
+        <small class="error-text" *ngIf="getFieldError('agent_name')">
+          {{ getFieldError('agent_name') }}
+        </small>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-field">
+        <label for="agent_node">Agent Node *</label>
+        <input 
+          pInputText 
+          id="agent_node" 
+          formControlName="agent_node"
+          placeholder="Enter agent node"
+          [class.error]="form.get('agent_node')?.invalid && form.get('agent_node')?.touched"
+        />
+        <small class="error-text" *ngIf="getFieldError('agent_node')">
+          {{ getFieldError('agent_node') }}
+        </small>
+      </div>
+
+      <div class="form-field">
+        <label for="is_active">Is Active</label>
+        <p-checkbox 
+          id="is_active" 
+          formControlName="is_active"
+          [binary]="true"
+        ></p-checkbox>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h4>Model Parameters</h4>
+      
+      <div class="form-row">
+        <div class="form-field">
+          <label for="temperature">Temperature</label>
+          <p-inputNumber 
+            id="temperature" 
+            formControlName="model_params.temperature"
+            [min]="0" 
+            [max]="2" 
+            [step]="0.1"
+            [useGrouping]="false"
+            [class.error]="form.get('model_params.temperature')?.invalid && form.get('model_params.temperature')?.touched"
+          ></p-inputNumber>
+          <small class="error-text" *ngIf="getFieldError('model_params.temperature')">
+            {{ getFieldError('model_params.temperature') }}
+          </small>
+        </div>
+
+        <div class="form-field">
+          <label for="max_tokens">Max Tokens</label>
+          <p-inputNumber 
+            id="max_tokens" 
+            formControlName="model_params.max_tokens"
+            [min]="1" 
+            [max]="4000" 
+            [step]="1"
+            [useGrouping]="false"
+            [class.error]="form.get('model_params.max_tokens')?.invalid && form.get('model_params.max_tokens')?.touched"
+          ></p-inputNumber>
+          <small class="error-text" *ngIf="getFieldError('model_params.max_tokens')">
+            {{ getFieldError('model_params.max_tokens') }}
+          </small>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label for="top_k">Top K</label>
+          <p-inputNumber 
+            id="top_k" 
+            formControlName="model_params.top_k"
+            [min]="1" 
+            [max]="100" 
+            [step]="1"
+            [useGrouping]="false"
+            [class.error]="form.get('model_params.top_k')?.invalid && form.get('model_params.top_k')?.touched"
+          ></p-inputNumber>
+          <small class="error-text" *ngIf="getFieldError('model_params.top_k')">
+            {{ getFieldError('model_params.top_k') }}
+          </small>
+        </div>
+
+        <div class="form-field">
+          <label for="top_p">Top P</label>
+          <p-inputNumber 
+            id="top_p" 
+            formControlName="model_params.top_p"
+            [min]="0" 
+            [max]="1" 
+            [step]="0.1"
+            [useGrouping]="false"
+            [class.error]="form.get('model_params.top_p')?.invalid && form.get('model_params.top_p')?.touched"
+          ></p-inputNumber>
+          <small class="error-text" *ngIf="getFieldError('model_params.top_p')">
+            {{ getFieldError('model_params.top_p') }}
+          </small>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label for="repetition_penalty">Repetition Penalty</label>
+          <p-inputNumber 
+            id="repetition_penalty" 
+            formControlName="model_params.repetition_penalty"
+            [min]="0.1" 
+            [max]="2.0" 
+            [step]="0.1"
+            [useGrouping]="false"
+            [class.error]="form.get('model_params.repetition_penalty')?.invalid && form.get('model_params.repetition_penalty')?.touched"
+          ></p-inputNumber>
+          <small class="error-text" *ngIf="getFieldError('model_params.repetition_penalty')">
+            {{ getFieldError('model_params.repetition_penalty') }}
+          </small>
+        </div>
+
+        <div class="form-field checkbox-field">
+          <label for="do_sample">Do Sample</label>
+          <p-checkbox 
+            id="do_sample" 
+            formControlName="model_params.do_sample"
+            [binary]="true"
+          ></p-checkbox>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field checkbox-field">
+          <label for="stream">Stream</label>
+          <p-checkbox 
+            id="stream" 
+            formControlName="model_params.stream"
+            [binary]="true"
+          ></p-checkbox>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section" *ngIf="isEditMode">
+      <h4>Audit Information</h4>
+      
+      <div class="form-row">
+        <div class="form-field">
+          <label for="created_by">Created By</label>
+          <input 
+            pInputText 
+            id="created_by" 
+            formControlName="created_by"
+            readonly
+          />
+        </div>
+
+        <div class="form-field">
+          <label for="created_at">Created At</label>
+          <p-calendar 
+            id="created_at" 
+            formControlName="created_at"
+            [readonlyInput]="true"
+            [showIcon]="false"
+          ></p-calendar>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label for="updated_by">Updated By</label>
+          <input 
+            pInputText 
+            id="updated_by" 
+            formControlName="updated_by"
+            placeholder="Enter updated by"
+          />
+        </div>
+
+        <div class="form-field">
+          <label for="updated_at">Updated At</label>
+          <p-calendar 
+            id="updated_at" 
+            formControlName="updated_at"
+            [readonlyInput]="true"
+            [showIcon]="false"
+          ></p-calendar>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button 
+        pButton 
+        type="button" 
+        label="Cancel" 
+        class="p-button-secondary"
+        (click)="onCancelClick()"
+      ></button>
+      <button 
+        pButton 
+        type="button" 
+        label="Save" 
+        class="p-button-primary"
+        (click)="onSaveClick()"
+        [disabled]="form.invalid"
+      ></button>
+    </div>
+  </form>
+</div>
