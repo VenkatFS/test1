@@ -1,9 +1,8 @@
-::ng-deep .mat-mdc-checkbox .mdc-checkbox__background {
-  border-color: #2196f3 !important; /* Blue border when unchecked */
+::ng-deep .blue-checkbox .mdc-checkbox__background {
+  border-color: #2196f3 !important;
 }
 
-::ng-deep .mat-mdc-checkbox.mat-mdc-checkbox-checked .mdc-checkbox__background,
-::ng-deep .mat-mdc-checkbox.mat-mdc-checkbox-indeterminate .mdc-checkbox__background {
-  background-color: #2196f3 !important; /* Blue fill when checked */
+::ng-deep .blue-checkbox.mat-mdc-checkbox-checked .mdc-checkbox__background {
+  background-color: #2196f3 !important;
   border-color: #2196f3 !important;
 }
