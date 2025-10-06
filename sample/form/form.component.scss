@@ -7,3 +7,17 @@
   background-color: #2196f3 !important; /* Blue fill when checked */
   border-color: #2196f3 !important;
 }
+
+
+::ng-deep .mat-mdc-checkbox .mat-mdc-focus-indicator::before,
+::ng-deep .mat-mdc-checkbox .mat-mdc-focus-indicator::after,
+::ng-deep .mat-mdc-checkbox .mdc-checkbox__ripple::before,
+::ng-deep .mat-mdc-checkbox .mdc-checkbox__ripple::after {
+  background-color: rgba(33, 150, 243, 0.2) !important; 
+}
+
+
+::ng-deep .mat-mdc-checkbox.cdk-focused .mdc-checkbox__ripple::before,
+::ng-deep .mat-mdc-checkbox.cdk-focused .mdc-checkbox__ripple::after {
+  background-color: rgba(33, 150, 243, 0.3) !important;
+}
