@@ -1,23 +1,14 @@
-::ng-deep .mat-mdc-checkbox .mdc-checkbox__background {
-  border-color: #2196f3 !important; /* Blue border when unchecked */
+::ng-deep .mat-mdc-checkbox:hover .mdc-checkbox__background,
+::ng-deep .mat-mdc-checkbox:focus-within .mdc-checkbox__background {
+  border-color: #1976d2 !important; /* Blue border on hover/focus */
 }
 
-::ng-deep .mat-mdc-checkbox.mat-mdc-checkbox-checked .mdc-checkbox__background,
-::ng-deep .mat-mdc-checkbox.mat-mdc-checkbox-indeterminate .mdc-checkbox__background {
-  background-color: #2196f3 !important; /* Blue fill when checked */
-  border-color: #2196f3 !important;
+::ng-deep .mat-mdc-checkbox:hover .mdc-checkbox__checkmark-path,
+::ng-deep .mat-mdc-checkbox:focus-within .mdc-checkbox__checkmark-path {
+  stroke: #1976d2 !important; /* Blue checkmark when hovered/focused */
 }
 
-
-::ng-deep .mat-mdc-checkbox .mat-mdc-focus-indicator::before,
-::ng-deep .mat-mdc-checkbox .mat-mdc-focus-indicator::after,
-::ng-deep .mat-mdc-checkbox .mdc-checkbox__ripple::before,
-::ng-deep .mat-mdc-checkbox .mdc-checkbox__ripple::after {
-  background-color: rgba(33, 150, 243, 0.2) !important; 
-}
-
-
-::ng-deep .mat-mdc-checkbox.cdk-focused .mdc-checkbox__ripple::before,
-::ng-deep .mat-mdc-checkbox.cdk-focused .mdc-checkbox__ripple::after {
-  background-color: rgba(33, 150, 243, 0.3) !important;
+::ng-deep .mat-mdc-checkbox:hover .mdc-checkbox__ripple,
+::ng-deep .mat-mdc-checkbox:focus-within .mdc-checkbox__ripple {
+  background-color: rgba(25, 118, 210, 0.1) !important; /* Blue ripple */
 }
