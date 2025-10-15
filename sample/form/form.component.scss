@@ -1,12 +1,24 @@
-tooltipValueGetter: (params) => {
-        const cellElement = params.eGridCell?.querySelector('.ag-cell-value');
-        if (cellElement && cellElement.scrollWidth > cellElement.clientWidth) {
-          return params.value; // show tooltip only if truncated
-        }
-        return null; // no tooltip if fully visible
-      },
+cellRenderer: (params) => {
+        const span = document.createElement('span');
+        span.innerText = params.value ?? '';
 
-       defaultColDef: ColDef = {
-    flex: 1,
-    cellStyle: { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
-  };
+        // Apply truncation styles
+        span.style.display = 'inline-block';
+        span.style.width = '100%';
+        span.style.overflow = 'hidden';
+        span.style.whiteSpace = 'nowrap';
+        span.style.textOverflow = 'ellipsis';
+
+        // Wait until rendered, then check overflow
+        setTimeout(() => {
+          if (span.scrollWidth > span.clientWidth) {
+            span.title = params.value; // show tooltip only if truncated
+          } else {
+            span.title = '';
+          }
+        });
+
+        return span;
+      },
+    },
+  ];
