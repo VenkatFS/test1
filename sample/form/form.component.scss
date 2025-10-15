@@ -1,7 +1,12 @@
-https://angularengineering.com/2024/01/22/angular-material-change-color-of-the-checkbox-mat-checkbox-outline-example/
+tooltipValueGetter: (params) => {
+        const cellElement = params.eGridCell?.querySelector('.ag-cell-value');
+        if (cellElement && cellElement.scrollWidth > cellElement.clientWidth) {
+          return params.value; // show tooltip only if truncated
+        }
+        return null; // no tooltip if fully visible
+      },
 
-
-
-https://stackblitz.com/edit/components-issue-checkbox-color-change-t7noj8fr?file=src%2Fapp%2Fexample-component.scss,src%2Fapp%2Fexample-component.html
-
-
+       defaultColDef: ColDef = {
+    flex: 1,
+    cellStyle: { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
+  };
