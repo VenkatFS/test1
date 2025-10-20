@@ -1,24 +1,5 @@
-cellRenderer: (params) => {
-        const span = document.createElement('span');
-        span.innerText = params.value ?? '';
-
-        // Apply truncation styles
-        span.style.display = 'inline-block';
-        span.style.width = '100%';
-        span.style.overflow = 'hidden';
-        span.style.whiteSpace = 'nowrap';
-        span.style.textOverflow = 'ellipsis';
-
-        // Wait until rendered, then check overflow
-        setTimeout(() => {
-          if (span.scrollWidth > span.clientWidth) {
-            span.title = params.value; // show tooltip only if truncated
-          } else {
-            span.title = '';
-          }
-        });
-
-        return span;
-      },
-    },
-  ];
+this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe((event: any) => {
+        this.currentRoute = event.urlAfterRedirects;
+      });
