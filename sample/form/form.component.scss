@@ -1,5 +1,9 @@
-this.router.events
-      .pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe((event: any) => {
-        this.currentRoute = event.urlAfterRedirects;
-      });
+import { forkJoin } from 'rxjs';
+
+const blobRequests = this.responses
+  .filter(item => item.type === 'image' || item.type === 'data_sheets')
+  .map(item => this.http.get(item.url, { responseType: 'blob' }));
+
+forkJoin(blobRequests).subscribe((results) => {
+  // results[i] corresponds to each blob response
+});
