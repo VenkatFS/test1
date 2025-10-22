@@ -1,9 +1,15 @@
-import { forkJoin } from 'rxjs';
+<img [attr.src]="item.blobUrl" loading="lazy" />
 
-const blobRequests = this.responses
-  .filter(item => item.type === 'image' || item.type === 'data_sheets')
-  .map(item => this.http.get(item.url, { responseType: 'blob' }));
 
-forkJoin(blobRequests).subscribe((results) => {
-  // results[i] corresponds to each blob response
-});
+
+<ng-container *ngFor="let item of responses">
+  <ng-defer on viewport>
+    <app-image [src]="item.blobUrl"></app-image>
+  </ng-defer>
+</ng-container>
+
+
+this.cdRef.detach();
+// perform heavy logic
+this.cdRef.detectChanges();
+this.cdRef.reattach();
