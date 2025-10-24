@@ -1,3 +1,18 @@
-const uniqueMessages = [
-  ...new Map(messages.map(item => [item.messageID, item])).values()
-];
+private removeDuplicateMessages(): void {
+  const uniqueMessages = new Map<string, any>();
+  const uniqueResponses = new Map<string, any>();
+
+  for (const msg of this.messages) {
+    if (!uniqueMessages.has(msg.message_id)) {
+      uniqueMessages.set(msg.message_id, msg);
+    }
+  }
+  for (const resp of this.messageResponses) {
+    if (!uniqueResponses.has(resp.message_id)) {
+      uniqueResponses.set(resp.message_id, resp);
+    }
+  }
+
+  this.messages = Array.from(uniqueMessages.values());
+  this.messageResponses = Array.from(uniqueResponses.values());
+}
