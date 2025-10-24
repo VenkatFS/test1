@@ -1,161 +1,164 @@
-evaluateHistoryType(historyResponse: any) {
+evaluateHistoryType(historyResponse: any[]): void {
+  if (!historyResponse?.length) return;
+
   this.historyResponseLength = historyResponse.length;
   this.typeCount = 0;
+  this.isStreaming = false;
+  this.isLoading = false;
 
-  let userQuestion = {
+  const first = historyResponse[0];
+  const userQuestion = this.createUserQuestion(first);
+
+  this.addUniqueMessage(this.messages, userQuestion);
+  this.messageResponses = [...this.messageResponses, userQuestion];
+
+  const pdfRequests$ = [];
+
+  for (const step of historyResponse) {
+    this.historyIndex = 1;
+
+    for (const response of step.response ?? []) {
+      if (response.type === 'image') {
+        const pdfRequest$ = this.handleImageResponse(step, response);
+        pdfRequests$.push(pdfRequest$);
+      } else if (response.type === 'text') {
+        this.handleTextResponse(step);
+      }
+    }
+  }
+
+  // Run all PDF (image) requests in parallel for speed
+  if (pdfRequests$.length > 0) {
+    this.subscriptions.add(
+      forkJoin(pdfRequests$).subscribe({
+        complete: () => {
+          this.scrollToBottomV2();
+        },
+      })
+    );
+  } else {
+    this.scrollToBottomV2();
+  }
+}
+
+
+
+private createUserQuestion(first: any) {
+  return {
     index: this.messageResponses.length,
     isChatHistory: true,
     sentBy: 'user',
     isTextResponse: true,
     isImageChart: false,
     isDatasheet: false,
-    row_id: historyResponse[0]?.message_id,
-    session_id: historyResponse[0]?.session_id,
-    message_id: historyResponse[0]?.message_id,
-    content: historyResponse[0]?.question,
-    system: historyResponse[0]?.system,
+    row_id: first?.message_id,
+    session_id: first?.session_id,
+    message_id: first?.message_id,
+    content: first?.question,
+    system: first?.system,
   };
-
-  this.messageResponses = [...this.messageResponses, userQuestion];
-
-  // Add userQuestion only if not already present
-  if (
-    !this.messages.some(
-      msg =>
-        msg.sentBy === 'user' &&
-        msg.message_id === userQuestion.message_id &&
-        msg.session_id === userQuestion.session_id
-    )
-  ) {
-    this.messages.push(userQuestion);
-  }
-
-  for (let step = 0; step < historyResponse.length; step++) {
-  this.historyIndex = 1;
-  historyResponse[step]?.response.forEach((response: any) => {
-    if (response?.type === 'image') {
-      this.isImageChartLoading = true;
-      this.chartDescription = response.description;
-      let imageName = this.getPdfFileName(response.path);
-      this.subscriptions.add(
-        this.pdfServiceService
-          .getDataFile(historyResponse?.[step]?.session_id, this.nbkkid, response.path)
-          .subscribe({
-            next: (blob) => {
-              if (blob) {
-                let pngSource = URL.createObjectURL(blob);
-                let imageResponse = {
-                  index: this.messageResponses.length,
-                  indexSub: this.historyIndex,
-                  isTextResponse: false,
-                  isImageChart: true,
-                  isDatasheet: false,
-                  chartPath: `${pngSource}#${imageName}`,
-                  isChatHistory: true,
-                  sentBy: 'bot',
-                  message_id: historyResponse[step]?.message_id,
-                  session_id: historyResponse[step]?.session_id,
-                  response_comment: historyResponse[step]?.response_comment,
-                  response_rank: historyResponse[step]?.response_rank,
-                  source_comment: historyResponse[step]?.source_comment,
-                  source_rank: historyResponse[step]?.source_rank,
-                };
-                this.messageResponses = [...this.messageResponses, imageResponse];
-              }
-            },
-            error: (err) =>
-              console.error(
-                'Chat Two this.pdfServiceService.getDataFile emitted an error: ' + err
-              ),
-            complete: () => {
-              this.getDataSheet(historyResponse[step], this.historyIndex);
-              this.historyIndex++;
-              this.scrollToBottomV2();
-            },
-          })
-      );
-    }
-  });
-
-  if (response?.type === 'text') {
-  if (response?.response && response.response.length > 0) {
-    for (let i = 0; i < historyResponse[step].response.length; i++) {
-      let messageResponse = {
-        index: this.messages.length,
-        isChatHistory: true,
-        sentBy: 'bot',
-        role: historyResponse[step].response[i].role,
-        isTextResponse: true,
-        isImageChart: false,
-        isDatasheet: false,
-        textResponse: historyResponse[step].response[i].response,
-        row_id: historyResponse[step].row_id,
-        session_id: historyResponse[step].session_id,
-        message_id: historyResponse[step].message_id,
-        content: historyResponse[step].response[i].response,
-        response_comment: historyResponse[step].response_comment,
-        response_rank: historyResponse[step].response_rank,
-        source_comment: historyResponse[step].source_comment,
-        source_rank: historyResponse[step].source_rank,
-        system: historyResponse[step].system ?? '',
-        updated_at: historyResponse[step].updated_at,
-        filename: historyResponse[step]?.source_path ?? '',
-        pageLabel: '',
-        sourceText: ''
-      };
-
-      if (historyResponse[step] && historyResponse[step].source) {
-        messageResponse.pageLabel = historyResponse[step].source[0]?.page_number;
-        messageResponse.sourceText = historyResponse[step].source[0]?.text;
-      }
-
-      const respArr = historyResponse[step].response[i]?.response ?? '';
-      if (
-        Array.isArray(respArr) &&
-        respArr[0]?.response ===
-          'File(s) may be processing or unavailable. Please check your knowledge bases.'
-      ) {
-        this.isFileProcessing = true;
-      } else {
-        if (historyResponse[step] && historyResponse[step].source) {
-          const source = historyResponse[step].source[0];
-          if (source?.source_path) {
-            messageResponse.filename = source.source_path ?? '';
-            messageResponse.pageLabel = source.page_number ?? '';
-            messageResponse.sourceText = source.content ?? '';
-            if (this.chatData5) {
-              this.chatData5.filename = source.source_path ?? '';
-              this.chatData5.pageLabel = source.page_label ?? '';
-               this.chatData5.sourceText = source.text ?? '';
-            }
-            this.chatTwoService.sendChatData(this.chatData$)
-          }
-        }
-      }
-
-
-      if (this.typeCount <= this.historyResponseLength) {
-    // Only add if not already present (by sentBy, message_id, session_id)
-    const exists = this.messages.some(
-        msg =>
-            msg.sentBy === messageResponse.sentBy &&
-            msg.message_id === messageResponse.message_id &&
-            msg.session_id === messageResponse.session_id
-    );
-    if (!exists) {
-        this.messages.push(messageResponse);
-    }
-    this.typeCount++;
 }
-this.isStreaming = false;
-this.isLoading = false;
-this.scrollToBottomV2();
 
+private handleImageResponse(step: any, response: any) {
+  this.isImageChartLoading = true;
+  this.chartDescription = response.description;
+  const imageName = this.getPdfFileName(response.path);
+
+  return this.pdfServiceService
+    .getDataFile(step?.session_id, this.nbkkid, response.path)
+    .pipe(
+      map((blob) => {
+        if (blob) {
+          const pngSource = URL.createObjectURL(blob);
+          const imageResponse = {
+            index: this.messageResponses.length,
+            indexSub: this.historyIndex++,
+            isTextResponse: false,
+            isImageChart: true,
+            isDatasheet: false,
+            chartPath: `${pngSource}#${imageName}`,
+            isChatHistory: true,
+            sentBy: 'bot',
+            message_id: step?.message_id,
+            session_id: step?.session_id,
+            response_comment: step?.response_comment,
+            response_rank: step?.response_rank,
+            source_comment: step?.source_comment,
+            source_rank: step?.source_rank,
+          };
+          this.messageResponses = [...this.messageResponses, imageResponse];
+        }
+      }),
+      tap(() => this.getDataSheet(step, this.historyIndex))
+    );
+}
+
+private handleTextResponse(step: any) {
+  if (!step?.response?.length) return;
+
+  for (const res of step.response) {
+    const messageResponse = this.buildMessageResponse(step, res);
+
+    const isFileProcessing =
+      Array.isArray(res.response) &&
+      res.response[0]?.response ===
+        'File(s) may be processing or unavailable. Please check your knowledge bases.';
+
+    if (isFileProcessing) {
+      this.isFileProcessing = true;
+    } else if (step.source?.length) {
+      const source = step.source[0];
+      messageResponse.filename = source.source_path ?? '';
+      messageResponse.pageLabel = source.page_number ?? '';
+      messageResponse.sourceText = source.content ?? '';
+
+      if (this.chatData$) {
+        this.chatData$.filename = source.source_path ?? '';
+        this.chatData$.pageLabel = source.page_label ?? '';
+        this.chatData$.sourceText = source.text ?? '';
+        this.chatTwoService.sendChatData(this.chatData$);
+      }
+    }
+
+    if (this.typeCount++ <= this.historyResponseLength) {
+      this.addUniqueMessage(this.messages, messageResponse);
     }
   }
-})
-  }
+}
 
+private buildMessageResponse(step: any, res: any) {
+  const source = step.source?.[0];
+  return {
+    index: this.messages.length,
+    isChatHistory: true,
+    sentBy: 'bot',
+    role: res.role,
+    isTextResponse: true,
+    isImageChart: false,
+    isDatasheet: false,
+    textResponse: res.response,
+    row_id: step.row_id,
+    session_id: step.session_id,
+    message_id: step.message_id,
+    content: res.response,
+    response_comment: step.response_comment,
+    response_rank: step.response_rank,
+    source_comment: step.source_comment,
+    source_rank: step.source_rank,
+    system: step.system ?? '',
+    updated_at: step.updated_at,
+    filename: source?.source_path ?? '',
+    pageLabel: source?.page_number ?? '',
+    sourceText: source?.text ?? '',
+  };
+}
 
-
+private addUniqueMessage(target: any[], newMsg: any) {
+  const exists = target.some(
+    (msg) =>
+      msg.sentBy === newMsg.sentBy &&
+      msg.message_id === newMsg.message_id &&
+      msg.session_id === newMsg.session_id
+  );
+  if (!exists) target.push(newMsg);
 }
