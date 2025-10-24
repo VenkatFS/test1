@@ -1,15 +1,3 @@
-<img [attr.src]="item.blobUrl" loading="lazy" />
-
-
-
-<ng-container *ngFor="let item of responses">
-  <ng-defer on viewport>
-    <app-image [src]="item.blobUrl"></app-image>
-  </ng-defer>
-</ng-container>
-
-
-this.cdRef.detach();
-// perform heavy logic
-this.cdRef.detectChanges();
-this.cdRef.reattach();
+const uniqueMessages = [
+  ...new Map(messages.map(item => [item.messageID, item])).values()
+];
