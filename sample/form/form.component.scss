@@ -1,18 +1,37 @@
-private removeDuplicateMessages(): void {
-  const uniqueMessages = new Map<string, any>();
-  const uniqueResponses = new Map<string, any>();
+private removeDuplicateMessages(messages: any[]): any[] {
+  const uniqueMap = new Map<string, any[]>();
 
-  for (const msg of this.messages) {
-    if (!uniqueMessages.has(msg.message_id)) {
-      uniqueMessages.set(msg.message_id, msg);
-    }
-  }
-  for (const resp of this.messageResponses) {
-    if (!uniqueResponses.has(resp.message_id)) {
-      uniqueResponses.set(resp.message_id, resp);
+  // Group all messages by message_id
+  for (const msg of messages) {
+    if (!msg?.message_id) continue;
+    if (!uniqueMap.has(msg.message_id)) {
+      uniqueMap.set(msg.message_id, [msg]);
+    } else {
+      uniqueMap.get(msg.message_id)!.push(msg);
     }
   }
 
-  this.messages = Array.from(uniqueMessages.values());
-  this.messageResponses = Array.from(uniqueResponses.values());
+  const deduped: any[] = [];
+
+  // For each message_id group
+  uniqueMap.forEach((group) => {
+    if (group.length === 1) {
+      // Only one — keep it
+      deduped.push(group[0]);
+      return;
+    }
+
+    // If any has a question, include all with question(s)
+    const hasQuestion = group.some((msg) => msg?.content || msg?.question);
+    if (hasQuestion) {
+      // Keep all that contain a question
+      const questionMessages = group.filter((msg) => msg?.content || msg?.question);
+      deduped.push(...questionMessages);
+    } else {
+      // Otherwise, keep only the last one (latest message)
+      deduped.push(group[group.length - 1]);
+    }
+  });
+
+  return deduped;
 }
