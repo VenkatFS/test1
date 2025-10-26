@@ -1,37 +1,22 @@
 private removeDuplicateMessages(messages: any[]): any[] {
-  const uniqueMap = new Map<string, any[]>();
+  if (!Array.isArray(messages)) return [];
 
-  // Group all messages by message_id
-  for (const msg of messages) {
+  // Sort messages by createdAt (descending: newest first)
+  const sorted = [...messages].sort((a, b) => {
+    const aTime = new Date(a?.createdAt || 0).getTime();
+    const bTime = new Date(b?.createdAt || 0).getTime();
+    return bTime - aTime;
+  });
+
+  // Deduplicate by message_id, keeping the *latest* message
+  const uniqueMap = new Map<string, any>();
+  for (const msg of sorted) {
     if (!msg?.message_id) continue;
     if (!uniqueMap.has(msg.message_id)) {
-      uniqueMap.set(msg.message_id, [msg]);
-    } else {
-      uniqueMap.get(msg.message_id)!.push(msg);
+      uniqueMap.set(msg.message_id, msg);
     }
   }
 
-  const deduped: any[] = [];
-
-  // For each message_id group
-  uniqueMap.forEach((group) => {
-    if (group.length === 1) {
-      // Only one — keep it
-      deduped.push(group[0]);
-      return;
-    }
-
-    // If any has a question, include all with question(s)
-    const hasQuestion = group.some((msg) => msg?.content || msg?.question);
-    if (hasQuestion) {
-      // Keep all that contain a question
-      const questionMessages = group.filter((msg) => msg?.content || msg?.question);
-      deduped.push(...questionMessages);
-    } else {
-      // Otherwise, keep only the last one (latest message)
-      deduped.push(group[group.length - 1]);
-    }
-  });
-
-  return deduped;
+  // Return the deduped, sorted list
+  return Array.from(uniqueMap.values());
 }
