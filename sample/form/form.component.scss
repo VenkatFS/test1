@@ -1,12 +1,5 @@
-<div *ngFor="let group of groupedArray">
-  <!-- Outer loop: each group -->
-  <div class="timestamp">
-    {{ group.createdAt | date:'medium' }}
-  </div>
-
-  <div *ngFor="let msg of group.response" class="message">
-    <strong>{{ msg.sentBy }}:</strong> {{ msg.text }}
-  </div>
-
-  <hr />
-</div>
+const updatedArray = groupedArray.map(group => {
+  const normalMsgs = group.response.filter(msg => msg.type !== 'code');
+  const codeMsgs = group.response.filter(msg => msg.type === 'code');
+  return { ...group, response: [...normalMsgs, ...codeMsgs] };
+});
