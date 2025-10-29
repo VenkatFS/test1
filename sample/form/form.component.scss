@@ -1,22 +1,11 @@
-private removeDuplicateMessages(messages: any[]): any[] {
-  if (!Array.isArray(messages)) return [];
+const groupedMap = shuffled.reduce((acc, curr) => {
+  if (!acc[curr.createdAt]) acc[curr.createdAt] = [];
+  acc[curr.createdAt].push(curr);
+  return acc;
+}, {});
 
-  // Sort messages by createdAt (descending: newest first)
-  const sorted = [...messages].sort((a, b) => {
-    const aTime = new Date(a?.createdAt || 0).getTime();
-    const bTime = new Date(b?.createdAt || 0).getTime();
-    return bTime - aTime;
-  });
-
-  // Deduplicate by message_id, keeping the *latest* message
-  const uniqueMap = new Map<string, any>();
-  for (const msg of sorted) {
-    if (!msg?.message_id) continue;
-    if (!uniqueMap.has(msg.message_id)) {
-      uniqueMap.set(msg.message_id, msg);
-    }
-  }
-
-  // Return the deduped, sorted list
-  return Array.from(uniqueMap.values());
-}
+// Step 3: Transform to desired array format
+const groupedArray = Object.entries(groupedMap).map(([timestamp, responses]) => ({
+  createdAt: Number(timestamp),
+  response: responses
+}));
