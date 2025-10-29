@@ -1,11 +1,12 @@
-const groupedMap = shuffled.reduce((acc, curr) => {
-  if (!acc[curr.createdAt]) acc[curr.createdAt] = [];
-  acc[curr.createdAt].push(curr);
-  return acc;
-}, {});
+<div *ngFor="let group of groupedArray">
+  <!-- Outer loop: each group -->
+  <div class="timestamp">
+    {{ group.createdAt | date:'medium' }}
+  </div>
 
-// Step 3: Transform to desired array format
-const groupedArray = Object.entries(groupedMap).map(([timestamp, responses]) => ({
-  createdAt: Number(timestamp),
-  response: responses
-}));
+  <div *ngFor="let msg of group.response" class="message">
+    <strong>{{ msg.sentBy }}:</strong> {{ msg.text }}
+  </div>
+
+  <hr />
+</div>
