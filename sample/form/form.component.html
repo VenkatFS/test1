@@ -1,128 +1,41 @@
-<div class="page-wrapper">
-  <div class="paper">
+import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 
-    <p class="title">
-      For support or any questions related to:
-    </p>
+@Injectable({ providedIn: 'root' })
+export class LocalStorageService {
 
-    <div class="support-row">
-      <mat-icon class="icon">info</mat-icon>
-      <span>APS Team</span>
-    </div>
+  private myPropSubject = new BehaviorSubject<any>(
+    this.getFromStorage()
+  );
 
-    <p class="email">
-      Email us at
-      <a href="mailto:dg.treasuryconnect_support@bofa.com">
-        dg.treasuryconnect_support@bofa.com
-      </a>
-    </p>
+  myProp$ = this.myPropSubject.asObservable();
 
-  </div>
-</div>
+  setToStorage(value: any) {
+    localStorage.setItem('myProp', JSON.stringify(value));
+    this.myPropSubject.next(value);
+  }
 
-
-.page-wrapper {
-  background-color: #e0e0e0; /* app background */
-  min-height: 100vh;
-  padding: 40px;
-  display: flex;
-  justify-content: center;
-}
-
-.paper {
-  width: 800px;               /* A4-like width */
-  min-height: 1000px;         /* page height */
-  background: #ffffff;
-  padding: 40px 50px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-  border-radius: 2px;
-  font-family: 'Times New Roman', serif;
-}
-
-.title {
-  font-size: 16px;
-  margin-bottom: 20px;
-}
-
-.support-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 12px;
-}
-
-.icon {
-  font-size: 18px;
-}
-
-.email {
-  font-size: 14px;
-}
-
-.email a {
-  color: #1a0dab;
-  text-decoration: underline;
+  getFromStorage() {
+    const value = localStorage.getItem('myProp');
+    return value ? JSON.parse(value) : null;
+  }
 }
 
 
-
---------
-
-
-<div class="page-wrapper">
-  <div class="mat-paper mat-elevation-z2">
-
-    <p class="title">
-      For support or any questions related to:
-    </p>
-
-    <div class="support-row">
-      <mat-icon>info</mat-icon>
-      <span>APS Team</span>
-    </div>
-
-    <p class="email">
-      Email us at
-      <a href="mailto:dg.treasuryconnect_support@bofa.com">
-        dg.treasuryconnect_support@bofa.com
-      </a>
-    </p>
-
-  </div>
-</div>
+---
 
 
---------
-.page-wrapper {
-  background-color: #e0e0e0;
-  min-height: 100vh;
-  padding: 40px;
-  display: flex;
-  justify-content: center;
+constructor(private storageService: LocalStorageService) {}
+
+updateValue() {
+  this.storageService.setToStorage({ name: 'Angular' });
 }
 
-.mat-paper {
-  width: 800px;
-  min-height: 1000px;
-  background: #ffffff;
-  padding: 40px 50px;
-  border-radius: 2px; /* Material paper */
-  font-family: 'Times New Roman', serif;
-}
 
-.title {
-  font-size: 16px;
-  margin-bottom: 20px;
-}
+constructor(private storageService: LocalStorageService) {}
 
-.support-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 12px;
-}
-
-.email a {
-  color: #1a0dab;
-  text-decoration: underline;
+ngOnInit() {
+  this.storageService.myProp$.subscribe(value => {
+    console.log('Updated value:', value);
+  });
 }
